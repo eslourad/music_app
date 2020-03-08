@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\playlist;
 use Illuminate\Http\Request;
 use App\Music;
+use App\music_playlist;
 
 class MusicController extends Controller
 {
@@ -27,13 +29,17 @@ class MusicController extends Controller
         $user = auth()->user()->id;
         $music = Music::where('id', $id)
             ->first();
+        $playlist = playlist::where('user_id', $user)
+            ->get();
         return view('music/view')
             ->with('music', $music)
-            ->with('user', $user);
+            ->with('user', $user)
+            ->with('playlist', $playlist);
     }
 
     public function add()
     {
+        $user = auth()->user()->id;
         return view('music/add', compact("user"));
     }
 
@@ -86,6 +92,7 @@ class MusicController extends Controller
             default:
                 $musics = Music::where('album_name', 'like', '%' . $request->keyword . '%')->paginate(12);
         }
+        $playlist = playlist::where('user_id', $user)->get();
 
         return view('home')
             ->with('musics', $musics)
@@ -93,7 +100,8 @@ class MusicController extends Controller
             ->with('isSearching', true)
             ->with('keyword', $request->keyword)
             ->with('category', $request->category)
-            ->with('user', $user);
+            ->with('user', $user)
+            ->with('playlist', $playlist);
     }
 
     public function edit($id)
@@ -149,6 +157,25 @@ class MusicController extends Controller
 
         $music->save();
         //dd($request->title);
-        return view('music/view', compact("music"));
+        return redirect('musics/'. $request->id);
+        //return view('music/view', compact("music"));
     }
+
+    public function deleteMusic(Request $request)
+    {
+        
+        $music = Music::find($request->id);
+        
+        $imageFile = public_path('image/cover/' . $music->album_image );
+        $musicFile = public_path('mp3/' . $music->file );
+
+        unlink($imageFile);
+        unlink($musicFile);
+
+        music_playlist::where('music_id', $request->id)->delete();
+
+        Music::find($request->id)->delete();
+        return 'success';
+    }
+
 }

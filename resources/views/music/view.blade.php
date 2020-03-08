@@ -3,9 +3,9 @@
 @section('content')
 <div class="container">
 	<div class="row">
-		<div class="col-12 col-sm-6">
+		<div class="col-12 col-sm-6 text-center">
 			<div class="d-flex align-items-end"  style="height:100%;">
-				<div>
+				<div style="margin:auto">
 					<div class="col-12 mx-auto text-center">
 						<img class="cover-img" src="{{URL::asset('/image/cover/' . $music->album_image)}}" alt="album_image" />
 					</div>
@@ -24,8 +24,13 @@
 							<span>{{ $music->album_name }}</span>
 						</div>
 						<div class="">
-							<a class="btn btn-primary" href="#" role="button">ADD TO PLAYLIST</a>
+							<a class="btn btn-success" href="#" role="button" onclick="showModal({{ $music->id }}, '{{ $music->title }}')">ADD TO PLAYLIST</a>
+						</div>
+                        <div class="mt-4">
+							@if(Auth::user()->is_admin == 1)
 							<a class="btn btnEdit ml-3" href="{{ route('music/edit', ['id' => $music->id ]) }}" role="button">EDIT MUSIC</a>
+                            <a class="btn btn-danger ml-3" href="#" id="btnDeleteMusic" role="button">DELETE MUSIC</a>
+							@endif
 						</div>
 					</div>
 					<div class="col-12">
@@ -42,10 +47,101 @@
 				<h4 class="text-label">LYRICS</h4>
 			</div>
 			<div class="text-center">
-				{!! $music->lyrics !!}
+				<pre>{{ $music->lyrics }}</pre>
 			</div>
 		</div>
 	</div>
+
+    <div class="modal fade bd-example-modal-sm" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                @if($playlist->isEmpty())
+					<div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">No Playlist</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-white">&times;</span>
+                        </button>
+                    </div>
+					<div class="modal-body pt-4 pb-4">
+						<h5 class="text-danger">You did not created a playlist yet</h5>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<a href="{{ route('playlists')}}">
+							<button type="submit" class="btn btn-primary">Go To Playlist</button>
+						</a>
+					</div> 
+                @else
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Choose a playlist</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-white">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @foreach($playlist as $item)
+                            <div class="playlist-tile" onclick="addToPlaylist({{ $item->id }}, '{{ $item->name }}');">
+                                <i class="fas fa-plus"></i> &nbsp;&nbsp;&nbsp; {{ $item->name }}
+                            </div>
+                        @endforeach
+
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+	<div class="modal fade bd-example-modal-sm" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">S U C C E S S</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="text-white">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><span style="font-weight: 700" id="spanMusicName"></span> is added to <span style="font-weight: 700" id="spanPlaylistName"></span> playlist successfully.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-sm" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">E R R O R</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="text-white">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><span style="font-weight: 700" id="spanMusicName2"></span> already exist in <span style="font-weight: 700" id="spanPlaylistName2"></span> playlist.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-sm" id="confimationModal" tabindex="-1" role="dialog" aria-labelledby="confimationModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">C O N F I R M A T I O N</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="text-white">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to permanently delete <span style="font-weight: 700" id="spanMusicNameOnDelete">{{ $music->title }}</span>?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">CANCEL</button>
+                  <button type="button" class="btn btn-danger btnConfirmDelete">CONFIRM</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <style>
 	.btnEdit {
@@ -58,6 +154,8 @@
 	}
     .cover-img {
         width: 100%;
+		max-height: 300px;
+		max-width:300px;
     }
 	.text-button {
         border-radius: 50%;
@@ -96,5 +194,86 @@
 		background-color: #555;
 	}
 
+	.playlist-tile {
+        margin-bottom: 10px;
+        cursor: pointer;
+        padding: 5px;
+        padding-left: 10px;
+        font-weight: 700;
+    }
+    .playlist-tile:hover {
+        background-color: #29B6F6;
+        color:white;
+    }
+
 </style>
+<script>
+	var musicID;
+	var musicName;
+	
+	function showModal(id, title) {
+		musicID = id
+        musicName = title
+        $('#exampleModalCenter').modal('show')
+	}
+
+	function addToPlaylist(playlistId, name) {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+            }
+        });
+        jQuery.ajax({
+            url: "{{ url('/addmusicplaylists') }}",
+            method: 'post',
+            data: {
+                music_id: musicID,
+                playlist_id: playlistId
+            },
+            success: function(result){
+                $('#exampleModalCenter').modal('hide')
+                if(result == 'success') {
+                    $("#spanMusicName").text(musicName)
+                    $("#spanPlaylistName").text(name)
+                    $('#successModal').modal('show')
+                } else {
+                    $("#spanMusicName2").text(musicName)
+                    $("#spanPlaylistName2").text(name)
+                    $('#errorModal').modal('show')
+                }
+                
+            }
+        });
+    }
+
+    $('#btnDeleteMusic').click(function(){
+        $('#confimationModal').modal('show')
+    });
+
+    $('.btnConfirmDelete').click(function(){
+        var id = {{ $music->id }}
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+            }
+        });
+        jQuery.ajax({
+            url: "{{ url('/deletemusic') }}",
+            method: 'post',
+            data: {
+            id: id,
+            },
+            success: function(result){
+                var playlistUrl = "{{ url('/') }}"
+                window.location.href = playlistUrl;
+                $('#confimationModal').modal('hide')
+            }
+        });
+        
+    });
+
+    
+
+    
+</script>
 @endsection

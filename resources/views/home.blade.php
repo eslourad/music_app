@@ -37,9 +37,7 @@
                                 <a class="links pt-2" href="{{ route('musics', ['id' => $payload->id ] ) }}">
                                     <button type="button" class="btn btnlinks btn-primary">Play Music</button>
                                 </a>
-                                <a class="links pt-2" href="{{ route('playlists', ['id' => Auth::user()->id] ) }}">
-                                    <button type="button" class="btn btnlinks btn-success">Add to Playlist</button>
-                                </a>
+                                <button type="button" class="btn btnlinks btn-success" onclick="showModal({{ $payload->id }}, '{{$payload->title }}')">Add to Playlist</button>
                             </div>
                         </div>
                     </div>
@@ -63,13 +61,84 @@
                 </div>
             @else
                 <div class="col-12 full d-flex justify-content-center">
-                    <p class="noMusic align-self-center">No music play, start adding music.</p>
+                    <p class="noMusic align-self-center">No music to play.</p>
                 </div>
             @endif
         @endif
     </div>
-    <div class="col-12 text-xs-center">
-    {{ $musics->links() }}
+    </div>
+        {{ $musics->links() }}
+    </div>
+    <!-- create modal -->
+    <div class="modal fade bd-example-modal-sm" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                @if($playlist->isEmpty())
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">No Playlist</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-white">&times;</span>
+                        </button>
+                    </div>
+					<div class="modal-body pt-4 pb-4">
+						<h5 class="text-danger">You did not created a playlist yet</h5>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<a href="{{ route('playlists')}}">
+							<button type="submit" class="btn btn-primary">Go To Playlist</button>
+						</a>
+					</div> 
+                @else
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Choose a playlist</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-white">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        @foreach($playlist as $item)
+                            <div class="playlist-tile" onclick="addToPlaylist({{ $item->id }}, '{{ $item->name }}');">
+                                <i class="fas fa-plus"></i> &nbsp;&nbsp;&nbsp; {{ $item->name }}
+                            </div>
+                        @endforeach
+
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-sm" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">S U C C E S S</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="text-white">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><span style="font-weight: 700" id="spanMusicName"></span> is added to <span style="font-weight: 700" id="spanPlaylistName"></span> playlist successfully.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-sm" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">E R R O R</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="text-white">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><span style="font-weight: 700" id="spanMusicName2"></span> already exist in <span style="font-weight: 700" id="spanPlaylistName2"></span> playlist.</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <style>
@@ -85,6 +154,7 @@
     }
     .cover-img {
         width: 100%;
+        max-height: 255px;
     }
     .song-title {
         font-size: 1.5em;
@@ -151,8 +221,57 @@
         width: 140px;
         margin-bottom: 10px;
     }
+
+
+    .playlist-tile {
+        margin-bottom: 10px;
+        cursor: pointer;
+        padding: 5px;
+        padding-left: 10px;
+        font-weight: 700;
+    }
+    .playlist-tile:hover {
+        background-color: #29B6F6;
+        color:white;
+    }
 </style>
 <script>
+    var musicID;
+    var musicName;
+    function showModal(id, name) {
+        musicID = id
+        musicName = name
+        $('#exampleModalCenter').modal('show')
+    }
+
+    function addToPlaylist(playlistId, name) {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+            }
+        });
+        jQuery.ajax({
+            url: "{{ url('/addmusicplaylists') }}",
+            method: 'post',
+            data: {
+                music_id: musicID,
+                playlist_id: playlistId
+            },
+            success: function(result){
+                $('#exampleModalCenter').modal('hide')
+                if(result == 'success') {
+                    $("#spanMusicName").text(musicName)
+                    $("#spanPlaylistName").text(name)
+                    $('#successModal').modal('show')
+                } else {
+                    $("#spanMusicName2").text(musicName)
+                    $("#spanPlaylistName2").text(name)
+                    $('#errorModal').modal('show')
+                }
+                
+            }
+        });
+    }
     
     document.getElementById('txtSearch').onkeyup = function(e) {
         if (e.keyCode === 13) {

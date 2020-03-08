@@ -58,7 +58,7 @@
                             <label for="birth_date" class="col-md-4 col-form-label text-md-right">{{ __('Date of Birth') }}</label>
 
                             <div class="col-md-6">
-                                <input id="birth_date" type="text" class="form-control @error('birth_date') is-invalid @enderror" name="birth_date" value="{{ old('birth_date') }}" required autocomplete="birth_date" autofocus>
+                                <input onkeydown="return false" id="birth_date" type="text" class="form-control @error('birth_date') is-invalid @enderror" name="birth_date" value="{{ old('birth_date') }}" required autocomplete="birth_date" autofocus>
 
                                 @error('birth_date')
                                     <span class="invalid-feedback" role="alert">
@@ -165,7 +165,13 @@
     body {
         background-color: #30303D;
     }
-    
+    .invalid-feedback {
+        color: white !important;
+    }
+    .gj-datepicker-bootstrap [role=right-icon] button {
+        color: white;
+        background-color: grey;
+    }
 </style>
 <script>
     $('#birth_date').datepicker({

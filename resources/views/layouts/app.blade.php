@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_token" content="{{csrf_token()}}" />
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -17,6 +18,7 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
     <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -95,9 +97,19 @@
                                         ">
                                                 Add Music
                                         </a>
+                                        <a class="dropdown-item" href="{{ route('users') }}"
+                                        ">
+                                                Users List
+                                        </a>
                                         @endif
-                                        <a class="dropdown-item" href="{{ route('playlists', ['id' => Auth::user()->id] ) }}">
+                                        <a class="dropdown-item" href="{{ route('playlists') }}">
                                                 My Playlist
+                                        </a>
+                                        <a class="dropdown-item" href="{{ route('settings') }}">
+                                                Update Profile
+                                        </a>
+                                        <a class="dropdown-item" href="{{ route('updatepassword') }}">
+                                                Change Password
                                         </a>
                                         <a class="dropdown-item" href="{{ route('logout') }}"
                                         onclick="event.preventDefault();

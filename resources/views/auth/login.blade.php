@@ -136,5 +136,8 @@
     .home-header {
         font-size: 5em;
     }
+    .invalid-feedback {
+        color: white !important;
+    }
 </style>
 @endsection

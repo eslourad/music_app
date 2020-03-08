@@ -67,8 +67,8 @@
             </span>
           </div>
           <div class="form-group">
-            <label for="lyrics">Lyrics<span class="hint"> (use &lt;br&gt; to line break)</span></label>
-            <textarea class="form-control @if ($errors->has('lyrics')) is-invalid @endif" name="lyrics" id="lyrics" rows="10">{{ old('lyrics') }}</textarea>
+            <label for="lyrics">Lyrics</label>
+            <textarea class="form-control @if ($errors->has('lyrics')) is-invalid @endif" name="lyrics" id="lyrics" rows="10">{{old('lyrics')}}</textarea>
             @if ($errors->has('lyrics'))
               <span class="invalid-feedback" role="alert">
                   <strong>{{ $errors->first('lyrics') }}</strong>

@@ -14,18 +14,42 @@
 
 Auth::routes();
 
-Route::get('/', 'HomeController@index')->name('home');
-Route::get('/home', 'HomeController@index')->name('home');
-Route::get('musics/{id}', 'MusicController@index')->name('musics');
-Route::get('search', 'MusicController@search')->name('search');
+Route::get('/subscribe', 'HomeController@subscribe')->name('subscribe');
 
-Route::get('playlists/{id}', 'PlaylistController@index')->name('playlists');
-Route::post('playlists', 'PlaylistController@store')->name('playlists');
+Route::group(['middleware' => 'premium'], function () {
+  Route::get('/', 'HomeController@index')->name('home');
+  Route::get('/home', 'HomeController@index')->name('home');
+  Route::get('musics/{id}', 'MusicController@index')->name('musics');
+  Route::get('search', 'MusicController@search')->name('search');
 
-Route::group(['middleware' => 'admin'], function () {
-  Route::get('music/add', 'MusicController@add')->name('music/add');
-  Route::post('music', 'MusicController@store')->name('music');
-  Route::get('music/edit/{id}', 'MusicController@edit')->name('music/edit');
-  Route::post('musicedit', 'MusicController@update')->name('musicedit');
+  Route::get('settings', 'HomeController@settings')->name('settings');
+  Route::post('userupdate', 'HomeController@userUpdate')->name('userupdate');
+  Route::get('updatepassword', 'HomeController@updatePassword')->name('updatepassword');
+  Route::post('changepassword', 'HomeController@changePassword')->name('changepassword');
+  
+  
+
+  Route::get('playlists', 'PlaylistController@index')->name('playlists');
+  Route::post('playlists', 'PlaylistController@store')->name('addplaylists');
+  Route::post('addmusicplaylists', 'PlaylistController@storeMusic')->name('addmusicplaylists');
+  Route::post('swap', 'PlaylistController@swapPosition')->name('swap');
+  Route::post('deletemusictoplaylist', 'PlaylistController@deleteMusicToPlaylist')->name('deletemusictoplaylist');
+  Route::get('playlist/play/{id}', 'PlaylistController@play')->name('playlist/play');
+  Route::post('renameplaylist', 'PlaylistController@renamePlaylist')->name('renameplaylist');
+  Route::post('deleteplaylist', 'PlaylistController@deletePlaylist')->name('deleteplaylist');
+
+
+  Route::group(['middleware' => 'admin'], function () {
+    Route::get('music/add', 'MusicController@add')->name('music/add');
+    Route::post('music', 'MusicController@store')->name('music');
+    Route::get('music/edit/{id}', 'MusicController@edit')->name('music/edit');
+    Route::post('musicedit', 'MusicController@update')->name('musicedit');
+    Route::post('deletemusic', 'MusicController@deleteMusic')->name('deletemusic');
+
+    Route::get('users', 'HomeController@usersList')->name('users');
+    Route::post('promotepremium', 'HomeController@promotePremium')->name('promotepremium');
+    Route::post('promoteadmin', 'HomeController@promoteAdmin')->name('promoteadmin');
+    Route::get('searchuser', 'HomeController@searchUser')->name('searchuser');
+  });
 });
 
