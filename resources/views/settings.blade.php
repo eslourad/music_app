@@ -86,5 +86,29 @@
     $('#birth_date').datepicker({
         uiLibrary: 'bootstrap4'
     });
+    $(document).ready(function(){
+    $("#first_name").keydown(function(event){
+        var inputValue = event.which;
+        // allow letters and whitespaces only.
+        if (event.keyCode == 8 || event.keyCode == 46
+        || event.keyCode == 37 || event.keyCode == 39) {
+            return true;
+        }
+        if(!(inputValue >= 65 && inputValue <= 120) && (inputValue != 32 && inputValue != 0)) { 
+            event.preventDefault(); 
+        }
+    });
+    $("#last_name").keydown(function(event){
+        var inputValue = event.which;
+        // allow letters and whitespaces only.
+        if (event.keyCode == 8 || event.keyCode == 46
+        || event.keyCode == 37 || event.keyCode == 39) {
+            return true;
+        }
+        if(!(inputValue >= 65 && inputValue <= 120) && (inputValue != 32 && inputValue != 0)) { 
+            event.preventDefault(); 
+        }
+    });
+});
 </script>
 @endsection

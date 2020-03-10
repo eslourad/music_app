@@ -120,6 +120,7 @@ class HomeController extends Controller
         $user->birth_date = $request->birth_date;
         $user->gender = $request->gender;
         $user->email = $request->email;
+        $user->name = $request->first_name . ' ' . $request->last_name;
         $user->save();
         
         if($user) {

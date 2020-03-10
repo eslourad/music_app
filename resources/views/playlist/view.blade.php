@@ -31,7 +31,7 @@
           <div class="flex-item">
             <p class="no-playlist-hint">It looks like you don't have a playlist yet</p>
             <button type="button" class="btn btn-primary btn-lg create-btn" onclick="showCreateModal()">Create Playlist</button>
-            </div>
+          </div>
       </div>
 
       

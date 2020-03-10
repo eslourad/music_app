@@ -97,13 +97,24 @@
                                         ">
                                                 Add Music
                                         </a>
+                                        <a class="dropdown-item" href="{{ route('podcast/add') }}"
+                                        ">
+                                                Add Podcast
+                                        </a>
                                         <a class="dropdown-item" href="{{ route('users') }}"
                                         ">
                                                 Users List
                                         </a>
+                                        <hr>
                                         @endif
                                         <a class="dropdown-item" href="{{ route('playlists') }}">
                                                 My Playlist
+                                        </a>
+                                        <a class="dropdown-item" href="{{ route('podcast') }}">
+                                                Podcast
+                                        </a>
+                                        <a class="dropdown-item" href="{{ route('chat') }}">
+                                                Chat
                                         </a>
                                         <a class="dropdown-item" href="{{ route('settings') }}">
                                                 Update Profile

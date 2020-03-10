@@ -49,7 +49,6 @@ class MusicController extends Controller
             'title' => 'required|max:255',
             'artist' => 'required|max:255',
             'album' => 'required|max:255',
-            'artist' => 'required|max:255',
             'album_image' => 'required|file|max:20000|mimes:jpeg,jpg,png,svg',
             'file' => 'required|file|max:20000|mimes:mpga,wav',
             'lyrics' => 'required',
