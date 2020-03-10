@@ -28,6 +28,9 @@ Route::group(['middleware' => 'premium'], function () {
   Route::post('changepassword', 'HomeController@changePassword')->name('changepassword');
   
   Route::get('podcast', 'PodcastController@index')->name('podcast');
+  Route::get('searchpodcast', 'PodcastController@searchPodcast')->name('searchpodcast');
+  Route::get('pc/{id}', 'PodcastController@pc')->name('pc');
+  
   
 
   Route::get('playlists', 'PlaylistController@index')->name('playlists');
@@ -42,6 +45,9 @@ Route::group(['middleware' => 'premium'], function () {
 
   Route::group(['middleware' => 'admin'], function () {
     Route::get('podcast/add', 'PodcastController@create')->name('podcast/add');
+    Route::post('podcast/store', 'PodcastController@store')->name('podcast/store');
+    Route::get('podcast/edit/{id}', 'PodcastController@edit')->name('podcast/edit');
+    Route::post('podcast/update', 'PodcastController@update')->name('podcast/update');
     Route::get('music/add', 'MusicController@add')->name('music/add');
     Route::post('music', 'MusicController@store')->name('music');
     Route::get('music/edit/{id}', 'MusicController@edit')->name('music/edit');

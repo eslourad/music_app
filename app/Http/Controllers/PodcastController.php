@@ -14,8 +14,37 @@ class PodcastController extends Controller
      */
     public function index()
     {   
-        $podcast = podcast::paginate(12);
+        $podcast = podcast::paginate(8);
         return view('podcast/view')
+            ->with('podcast', $podcast)
+            ->with('keyword', '')
+            ->with('isSearching', false)
+            ->with('category', 'title')
+            ;
+    }
+
+    public function searchPodcast(Request $request)
+    {
+        //dd($request);
+        switch ($request->category) {
+            case 'title':
+                $podcast = podcast::where('title', 'like', '%' . $request->keyword . '%')->paginate(8);
+                break;
+            default:
+                $podcast = podcast::where('host', 'like', '%' . $request->keyword . '%')->paginate(8);
+        }
+        return view('podcast/view')
+        ->with('keyword', $request->keyword)
+        ->with('category', $request->category)
+        ->with('isSearching', true)
+        ->with('podcast', $podcast);
+    }
+
+    public function pc($id)
+    {
+        $podcast = podcast::where('id', $id)
+             ->first();
+        return view('podcast/play')
             ->with('podcast', $podcast);
     }
 
@@ -44,61 +73,90 @@ class PodcastController extends Controller
             'file' => 'required|file|mimes:mpga,wav',
             'description' => 'required',
         ]);
-
         //upload the image
-        $imageName = 'i'.time().'.'.request()->album_image->getClientOriginalExtension();
+        $imageName = 'i'.time().'.'.request()->thumbnail->getClientOriginalExtension();
 
-        request()->album_image->move(public_path('image/cover'), $imageName);
+        request()->thumbnail->move(public_path('image/podcast'), $imageName);
 
         //upload the music
         $musicName = 'm'.time().'.'.request()->file->getClientOriginalExtension();
 
-        request()->file->move(public_path('mp3'), $musicName);
+        request()->file->move(public_path('mp3/podcast'), $musicName);
 
-        $music = new Music;
-        $music->title = $request->title;
-        $music->artist = $request->artist;
-        $music->album_name = $request->album;
-        $music->album_image = $imageName;
-        $music->file = $musicName;
-        $music->lyrics = $request->lyrics;
-        $music->save();
+        $podcast = new podcast;
+        $podcast->title = $request->title;
+        $podcast->host = $request->host;
+        $podcast->thumbnail = $imageName;
+        $podcast->file = $musicName;
+        $podcast->description = $request->description;
+        $podcast->save();
 
-        return view('music/confirm', compact("music"));
+        if($podcast) {
+            $request->session()->flash('message.level', 'success');
+            $request->session()->flash('message.content', 'Podcast added successfully!');
+        } else {
+            $request->session()->flash('message.level', 'danger');
+            $request->session()->flash('message.content', 'Something went wrong!');
+        }
+
+        return redirect('podcast/add');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\podcast  $podcast
-     * @return \Illuminate\Http\Response
-     */
-    public function show(podcast $podcast)
+    public function edit($id)
     {
-        //
+        $podcast = podcast::where('id', $id)
+             ->first();
+        return view('podcast/edit')
+            ->with('podcast', $podcast);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\podcast  $podcast
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(podcast $podcast)
+    public function update(Request $request)
     {
-        //
-    }
+        $validatedData = $request->validate([
+            'title' => 'required|max:255',
+            'host' => 'required|max:255',
+            'thumbnail' => 'file|max:20000|mimes:jpeg,jpg,png,svg',
+            'file' => 'file|mimes:mpga,wav',
+            'description' => 'required',
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\podcast  $podcast
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, podcast $podcast)
-    {
-        //
+        $podcast = podcast::find($request->id);
+        //upload the image
+        if($request->thumbnail) {
+            $imageName = 'i'.time().'.'.request()->thumbnail->getClientOriginalExtension();
+
+            request()->thumbnail->move(public_path('image/podcast'), $imageName);
+            $file_path = public_path('image/podcast/'.$podcast->thumbnail);
+            unlink($file_path);
+        } else {
+            $imageName = $podcast->thumbnail;
+        }
+
+        //upload the music
+        if($request->file) {
+            $musicName = 'm'.time().'.'.request()->file->getClientOriginalExtension();
+            request()->file->move(public_path('mp3/podcast'), $musicName);
+            $file_path = public_path('/mp3/podcast/'.$podcast->file);
+            unlink($file_path);
+        } else {
+            $musicName = $podcast->file;
+        }
+
+        $podcast->title = $request->title;
+        $podcast->host = $request->host;
+        $podcast->thumbnail = $imageName;
+        $podcast->file = $musicName;
+        $podcast->description = $request->description;
+        $podcast->save();
+
+        if($podcast) {
+            $request->session()->flash('message.level', 'success');
+            $request->session()->flash('message.content', 'Podcast added successfully!');
+        } else {
+            $request->session()->flash('message.level', 'danger');
+            $request->session()->flash('message.content', 'Something went wrong!');
+        }
+
+        return redirect('podcast/edit/'. $request->id);
     }
 
     /**

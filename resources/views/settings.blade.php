@@ -91,7 +91,7 @@
         var inputValue = event.which;
         // allow letters and whitespaces only.
         if (event.keyCode == 8 || event.keyCode == 46
-        || event.keyCode == 37 || event.keyCode == 39) {
+        || event.keyCode == 37 || event.keyCode == 39) || event.keyCode == 9 {
             return true;
         }
         if(!(inputValue >= 65 && inputValue <= 120) && (inputValue != 32 && inputValue != 0)) { 
@@ -102,7 +102,7 @@
         var inputValue = event.which;
         // allow letters and whitespaces only.
         if (event.keyCode == 8 || event.keyCode == 46
-        || event.keyCode == 37 || event.keyCode == 39) {
+        || event.keyCode == 37 || event.keyCode == 39 || event.keyCode == 3) {
             return true;
         }
         if(!(inputValue >= 65 && inputValue <= 120) && (inputValue != 32 && inputValue != 0)) { 

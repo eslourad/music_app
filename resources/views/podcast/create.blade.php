@@ -6,10 +6,15 @@
         <div class="col-12">
             <div class="card">
             <div class="card-header">
-                New Music
+                New Podcast
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ route('music') }}" enctype="multipart/form-data">
+                @if(session()->has('message.level'))
+                    <div class="alert alert-{{ session('message.level') }}"> 
+                    {!! session('message.content') !!}
+                    </div>
+                @endif
+                <form method="POST" action="{{ route('podcast/store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="form-group">
                     <label for="title">Title</label>

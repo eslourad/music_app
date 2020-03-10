@@ -18,7 +18,7 @@ class CreatePodcastsTable extends Migration
             $table->string('title');
             $table->string('host');
             $table->string('thumbnail');
-            $table->string('description');
+            $table->longText('description');
             $table->string('file');
             $table->timestamps();
         });
